@@ -44,7 +44,8 @@ LIVE_MODE_MSG_HEAD = SETUP_MSG_PREFIX + (
     WRITE_COMMAND,
     WORKING_MEMORY_ID,
     LIVE_MODE_PROPERTY,
-    LIVE_MODE_MSG_HARDWARE_ID_BYTE)
+    LIVE_MODE_MSG_HARDWARE_ID_BYTE
+)
 
 
 def split_list(l, size):
@@ -56,9 +57,9 @@ class ArturiaControlSurface(ControlSurface):
     def __init__(self, *a, **k):
         super(ArturiaControlSurface, self).__init__(*a, **k)
         self._messages_to_send = []
-        self._setup_hardware_task = self._tasks.add(
-            Task.sequence(Task.run(self._collect_setup_messages), Task.wait(SETUP_HARDWARE_DELAY),
-                          Task.run(self._setup_hardware)))
+        self._setup_hardware_task = self._tasks.add(Task.sequence(Task.run(self._collect_setup_messages),
+                                                                  Task.wait(SETUP_HARDWARE_DELAY),
+                                                                  Task.run(self._setup_hardware)))
         self._setup_hardware_task.kill()
         self._start_hardware_setup()
 

@@ -16,6 +16,7 @@ TRIGGERED_TO_PLAY_VALUE = 4
 STARTED_VALUE = 4
 STOPPED_VALUE = 5
 
+
 class ClipSlotComponent(ClipSlotComponentBase):
 
     def __init__(self, *a, **k):
@@ -31,7 +32,7 @@ class ClipSlotComponent(ClipSlotComponentBase):
         self._update_led()
 
     def _update_led(self):
-        if self.is_enabled() and self._led != None:
+        if self.is_enabled() and self._led is not None:
             value_to_send = self._feedback_value()
             if value_to_send in (None, -1):
                 value_to_send = EMPTY_VALUE
@@ -39,7 +40,7 @@ class ClipSlotComponent(ClipSlotComponentBase):
         return
 
     def _feedback_value(self):
-        if self._clip_slot != None:
+        if self._clip_slot is not None:
             if self.has_clip():
                 clip = self._clip_slot.clip
                 if clip.is_triggered:

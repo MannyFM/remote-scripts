@@ -1,3 +1,6 @@
 [submodule "AbletonLive-API-Stub"]
 	path = AbletonLive-API-Stub
 	url = https://github.com/cylab/AbletonLive-API-Stub
+[submodule "Launchpad95"]
+	path = Launchpad95
+	url = https://github.com/hdavid/Launchpad95

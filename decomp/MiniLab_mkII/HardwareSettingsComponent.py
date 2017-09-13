@@ -10,6 +10,7 @@ from _Framework.SubjectSlot import subject_slot
 from _Arturia.ArturiaControlSurface import OFF_VALUE, ON_VALUE
 LIVE_MEMORY_SLOT_INDEX = 7
 
+
 class HardwareSettingsComponent(ControlSurfaceComponent):
     __subject_events__ = ('live_mode', )
 

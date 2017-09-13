@@ -8,13 +8,14 @@ from __future__ import absolute_import, print_function
 
 import time
 
-from _Framework.ButtonElement import ButtonElement
+import Live
+from _Framework.ButtonMatrixElement import ButtonMatrixElement
 from _Framework.ControlSurface import ControlSurface
-from _Framework.InputControlElement import MIDI_NOTE_TYPE, MIDI_CC_TYPE
-from _Framework.MixerComponent import MixerComponent
+from _Framework.DeviceComponent import DeviceComponent
+from _Framework.EncoderElement import EncoderElement
+from _Framework.InputControlElement import MIDI_CC_TYPE
+from _Framework.Layer import Layer
 from _Framework.SessionComponent import SessionComponent
-from _Framework.SliderElement import SliderElement
-from _Framework.TransportComponent import TransportComponent
 
 ANALOG_LAB_MEMORY_SLOT_ID = 1
 LIVE_MEMORY_SLOT_ID = 8
@@ -27,99 +28,39 @@ mixer = None
 
 
 class MiniArt(ControlSurface):
+    session_component_type = SessionComponent
+    encoder_msg_channel = 1
+    encoder_msg_ids = (22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 33, 34, 52, 53, 54, 55)
+    pad_channel = 10
+
     def __init__(self, c_instance):
         """everything except the '_on_selected_track_changed' override and 'disconnect' runs from here"""
         ControlSurface.__init__(self, c_instance)
 
-        self.log_message(time.strftime("%d.%m.%Y %H:%M:%S", time.localtime()) +
-                         "--------------= ProjectX log opened =--------------")
-
         with self.component_guard():
-            self._create_transport_control()
-            self._create_mixer_control()
-            self._create_session_control()
+            self._create_controls()
+            self._create_device()
 
-        self.request_rebuild_midi_map()
-        self.log_message("Captain's last log stardate ****")
+        self.log_message("Captain's last log stardate #0 ****")
 
-    def _create_transport_control(self):
+    def _create_controls(self):
+        self._device_controls = ButtonMatrixElement(rows=[
+            [
+                EncoderElement(MIDI_CC_TYPE, self.encoder_msg_channel, identifier,
+                               Live.MidiMap.MapMode.relative_smooth_two_compliment,
+                               name='Encoder_%d_%d' % (column_index, row_index))
+                for column_index, identifier in enumerate(row)
+            ]
+            for row_index, row in enumerate((self.encoder_msg_ids[:4], self.encoder_msg_ids[8:12]))
+        ])
+        pass
 
-        self._transport = TransportComponent(is_enabled=True, name='Transport')
-        """set up the buttons"""
-
-        self._transport.set_tempo_control(SliderElement(MIDI_CC_TYPE, CHANNEL, 26),
-                                          SliderElement(MIDI_CC_TYPE, CHANNEL, 25))
-
-        self.log_message("Captain's log stardate 1")
-
-    def _create_mixer_control(self):
-        is_momentary = True
-        num_tracks = 7
-        """Here we set up the global mixer"""
-        global mixer
-        mixer = MixerComponent(name='Mixer', num_tracks=num_tracks, is_enabled=False, num_returns=2)
-        mixer.set_enabled(True)
-        mixer.set_track_offset(0)
-        self.song().view.selected_track = mixer.channel_strip(0)._track
-        mixer.channel_strip(0)
-
-        """set up the mixer buttons"""
-        mixer.set_select_buttons(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 56),
-                                 ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 54))
-        mixer.selected_strip().set_arm_button(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 46))
-
-        """set up the mixer sliders"""
-        mixer.selected_strip().set_volume_control(SliderElement(MIDI_CC_TYPE, CHANNEL, 14))
-
-        self.log_message("Captain's log stardate 2")
-
-    def _create_session_control(self):
-        is_momentary = True
-        num_tracks = 1
-        num_scenes = 7
-        global session
-        session = SessionComponent(num_tracks, num_scenes)
-        session.set_offsets(0, 0)
-        """set up the session navigation buttons"""
-        session.set_select_buttons(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 25),
-                                   ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 27))
-        session.set_scene_bank_buttons(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 51),
-                                       ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 49))
-        session.set_stop_all_clips_button(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 70))
-        session.selected_scene().set_launch_button(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 30))
-
-        """Here we set up the scene launch assignments for the session"""
-        launch_notes = [60, 62, 64, 65, 67, 69, 71]
-        for index in range(num_scenes):
-            session.scene(index).set_launch_button(ButtonElement(is_momentary, MIDI_NOTE_TYPE,
-                                                                 CHANNEL, launch_notes[index]))
-
-        """Here we set up the track stop launch assignment(s) for the session"""
-        stop_track_buttons = []
-        for index in range(num_tracks):
-            stop_track_buttons.append(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 58 + index))
-        session.set_stop_track_clip_buttons(tuple(stop_track_buttons))
-
-        """Here we set up the clip launch assignments for the session"""
-        clip_launch_notes = [48, 50, 52, 53, 55, 57, 59]
-        for index in range(num_scenes):
-            session.scene(index).clip_slot(0).set_launch_button(
-                ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, clip_launch_notes[index]))
-        """Here we set up a mixer and channel strip(s) which move with the session"""
-
-        self.log_message("Captain's log stardate 3")
-
-    def _on_selected_track_changed(self):
-        """This is an override, to add special functionality (we want to move the session to the selected track,
-        when it changes) Note that it is sometimes necessary to reload Live (not just the script) when making changes
-        to this function"""
-        ControlSurface._on_selected_track_changed(self)
-        """here we set the mixer and session to the selected track, when the selected track changes"""
-        selected_track = self.song().view.selected_track
-        mixer.channel_strip(0).set_track(selected_track)
-        all_tracks = ((self.song().tracks + self.song().return_tracks) + (self.song().master_track,))
-        index = list(all_tracks).index(selected_track)
-        session.set_offsets(index, session._scene_offset)
+    def _create_device(self):
+        self._device = DeviceComponent(name='Device', is_enabled=False,
+                                       layer=Layer(parameter_controls=self._device_controls),
+                                       device_selection_follows_track_selection=True)
+        self._device.set_enabled(True)
+        self.set_device_component(self._device)
 
     def disconnect(self):
         """clean things up on disconnect"""
