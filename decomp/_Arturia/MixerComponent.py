@@ -7,6 +7,7 @@
 from _Framework.MixerComponent import MixerComponent as MixerComponentBase
 from .ScrollComponent import ScrollComponent
 
+
 class MixerComponent(MixerComponentBase):
 
     def __init__(self, *a, **k):

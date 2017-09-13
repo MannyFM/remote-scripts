@@ -1,6 +1,6 @@
 # uncompyle6 version 2.11.3
 # Python bytecode 2.7 (62211)
-# Decompiled from: Python 2.7.13 (default, Jul 18 2017, 09:17:00) 
+# Decompiled from: Python 2.7.13 (default, Jul 18 2017, 09:17:00)
 # [GCC 4.2.1 Compatible Apple LLVM 8.1.0 (clang-802.0.42)]
 # Embedded file name: /Users/versonator/Jenkins/live/output/mac_64_static/Release/python-bundle/MIDI Remote Scripts/_Arturia/ArturiaControlSurface.py
 # Compiled at: 2017-06-21 09:03:47
@@ -8,8 +8,9 @@ from __future__ import with_statement
 from functools import partial
 from _Framework import Task
 from _Framework.ControlSurface import ControlSurface
+
 SETUP_MSG_PREFIX = (240, 0, 32, 107, 127, 66)
-SETUP_MSG_SUFFIX = (247, )
+SETUP_MSG_SUFFIX = (247,)
 WRITE_COMMAND = 2
 LOAD_MEMORY_COMMAND = 5
 STORE_IN_MEMORY_COMMAND = 6
@@ -33,16 +34,18 @@ ENCODER_TWOS_COMPLEMENT_MODE_OPTION = 2
 ON_VALUE = 127
 OFF_VALUE = 0
 LIVE_MODE_MSG_HARDWARE_ID_BYTE = 16
-BUTTON_MSG_TYPES = {'note': BUTTON_NOTE_MODE,
-   'cc': BUTTON_CC_MODE
-   }
+BUTTON_MSG_TYPES = {
+    'note': BUTTON_NOTE_MODE,
+    'cc': BUTTON_CC_MODE
+}
 SETUP_HARDWARE_DELAY = 1.0
 INDIVIDUAL_MESSAGE_DELAY = 0.001
 LIVE_MODE_MSG_HEAD = SETUP_MSG_PREFIX + (
- WRITE_COMMAND,
- WORKING_MEMORY_ID,
- LIVE_MODE_PROPERTY,
- LIVE_MODE_MSG_HARDWARE_ID_BYTE)
+    WRITE_COMMAND,
+    WORKING_MEMORY_ID,
+    LIVE_MODE_PROPERTY,
+    LIVE_MODE_MSG_HARDWARE_ID_BYTE)
+
 
 def split_list(l, size):
     for i in xrange(0, len(l), size):
@@ -50,23 +53,24 @@ def split_list(l, size):
 
 
 class ArturiaControlSurface(ControlSurface):
-
     def __init__(self, *a, **k):
         super(ArturiaControlSurface, self).__init__(*a, **k)
         self._messages_to_send = []
-        self._setup_hardware_task = self._tasks.add(Task.sequence(Task.run(self._collect_setup_messages), Task.wait(SETUP_HARDWARE_DELAY), Task.run(self._setup_hardware)))
+        self._setup_hardware_task = self._tasks.add(
+            Task.sequence(Task.run(self._collect_setup_messages), Task.wait(SETUP_HARDWARE_DELAY),
+                          Task.run(self._setup_hardware)))
         self._setup_hardware_task.kill()
         self._start_hardware_setup()
 
     def _collect_setup_messages(self):
         """
-        Override to set up controls on the hardware
+            Override to set up controls on the hardware
         """
         raise NotImplementedError
 
     def _setup_hardware_encoder(self, hardware_id, identifier, channel=0):
         """
-        Set up a relative encoder using a twos complement coding scheme
+            Set up a relative encoder using a twos complement coding scheme
         """
         self._set_encoder_cc_msg_type(hardware_id)
         self._set_identifier(hardware_id, identifier)
@@ -75,7 +79,7 @@ class ArturiaControlSurface(ControlSurface):
 
     def _setup_hardware_slider(self, hardware_id, identifier, channel=0):
         """
-        Set up a simple hardware fader
+            Set up a simple hardware fader
         """
         self._set_encoder_cc_msg_type(hardware_id)
         self._set_identifier(hardware_id, identifier)
@@ -83,7 +87,7 @@ class ArturiaControlSurface(ControlSurface):
 
     def _setup_hardware_button(self, hardware_id, identifier, channel=0, is_momentary=True, msg_type='note'):
         """
-        Set up a momentary button sending MIDI notes
+            Set up a momentary button sending MIDI notes
         """
         assert msg_type in BUTTON_MSG_TYPES.keys()
         self._set_button_msg_type(hardware_id, msg_type)
@@ -92,7 +96,8 @@ class ArturiaControlSurface(ControlSurface):
         self._set_momentary_mode(hardware_id, is_momentary)
 
     def _set_encoder_cc_msg_type(self, hardware_id, is_relative=False):
-        self._collect_setup_message(MODE_PROPERTY, hardware_id, is_relative or ENCODER_CC_MODE if 1 else ENCODER_RELATIVE_CC_MODE)
+        self._collect_setup_message(MODE_PROPERTY, hardware_id,
+                                    is_relative or ENCODER_CC_MODE if 1 else ENCODER_RELATIVE_CC_MODE)
 
     def _set_button_msg_type(self, hardware_id, msg_type):
         self._collect_setup_message(MODE_PROPERTY, hardware_id, BUTTON_MSG_TYPES[msg_type])
@@ -133,10 +138,9 @@ class ArturiaControlSurface(ControlSurface):
         return
 
     def _setup_hardware(self):
-        sequence_to_run = [
-         None] * (len(self._messages_to_send) * 2)
-        sequence_to_run[::2] = [ Task.run(partial(self._send_midi, msg)) for msg in self._messages_to_send ]
-        sequence_to_run[1::2] = [ Task.wait(INDIVIDUAL_MESSAGE_DELAY) for _ in self._messages_to_send ]
+        sequence_to_run = [None] * (len(self._messages_to_send) * 2)
+        sequence_to_run[::2] = [Task.run(partial(self._send_midi, msg)) for msg in self._messages_to_send]
+        sequence_to_run[1::2] = [Task.wait(INDIVIDUAL_MESSAGE_DELAY) for _ in self._messages_to_send]
         for subsequence in split_list(sequence_to_run, 40):
             self._tasks.add(Task.sequence(*subsequence))
 

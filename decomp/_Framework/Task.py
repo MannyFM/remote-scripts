@@ -419,6 +419,7 @@ wait = WaitTask
 fade = FadeTask
 delay = DelayTask
 
+
 def invfade(f, *a, **k):
     return fade((lambda x: f(1.0 - x)), *a, **k)
 
@@ -437,9 +438,9 @@ try:
 except ImportError as err:
     pass
 
+
 def run(func, *a, **k):
-    return FuncTask(lambda t:     if func(*a, **k):
-NoneNone)
+    return FuncTask(lambda t: (None if func(*a, **k) else None))
 
 
 def repeat(task):

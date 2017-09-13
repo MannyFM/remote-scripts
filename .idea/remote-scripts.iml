@@ -7,7 +7,7 @@
       <sourceFolder url="file://$MODULE_DIR$/MiniArt_II" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/ProjectX" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/MiniArt" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/AbletonLive-API-Stub/Live" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/AbletonLive-API-Stub" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
