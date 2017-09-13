@@ -1,6 +1,6 @@
 # uncompyle6 version 2.11.3
 # Python bytecode 2.7 (62211)
-# Decompiled from: Python 2.7.13 (default, Jul 18 2017, 09:17:00) 
+# Decompiled from: Python 2.7.13 (default, Jul 18 2017, 09:17:00)
 # [GCC 4.2.1 Compatible Apple LLVM 8.1.0 (clang-802.0.42)]
 # Embedded file name: /Users/versonator/Jenkins/live/output/mac_64_static/Release/python-bundle/MIDI Remote Scripts/MiniLab_mkII/MiniLabMk2.py
 # Compiled at: 2017-06-21 09:03:46
@@ -33,8 +33,7 @@ class MiniArt(MiniLab):
 
     def _create_controls(self):
         super(MiniArt, self)._create_controls()
-        self._pad_leds = ButtonMatrixElement(rows=[ [ SysexValueControl(message_prefix=SETUP_MSG_PREFIX + (WRITE_COMMAND, WORKING_MEMORY_ID, COLOR_PROPERTY, column + 112 + row * 8), default_value=(0, ), name='Pad_LED_%d' % (column,)) for column in xrange(8) ] for row in xrange(2)
-                                                  ], name='Pad_LED_Matrix')
+        self._pad_leds = ButtonMatrixElement(rows=[[SysexValueControl(message_prefix=SETUP_MSG_PREFIX + (WRITE_COMMAND, WORKING_MEMORY_ID, COLOR_PROPERTY, column + 112 + row * 8), default_value=(0, ), name='Pad_LED_%d' % (column,)) for column in xrange(8)] for row in xrange(2)], name='Pad_LED_Matrix')
         self._memory_slot_selection = SysexValueControl(message_prefix=SETUP_MSG_PREFIX + (MEMORY_SLOT_PROPERTY,), name='Memory_Slot_Selection')
         self._hardware_live_mode_switch = SysexValueControl(message_prefix=LIVE_MODE_MSG_HEAD, default_value=(
          OFF_VALUE,), name='Hardware_Live_Mode_Switch')

@@ -10,14 +10,14 @@ from .MiniArt import MiniArt
 
 
 def get_capabilities():
-    return {caps.CONTROLLER_ID_KEY: caps.controller_id(vendor_id=7285, product_ids=[
-                              649], model_name=[
-                              'Arturia MiniLab mkII']),
-       caps.PORTS_KEY: [
-                      caps.inport(props=[caps.NOTES_CC, caps.SCRIPT, caps.REMOTE]),
-                      caps.outport(props=[caps.SCRIPT])]
-       }
+	return {
+		caps.CONTROLLER_ID_KEY: caps.controller_id(vendor_id=7285, product_ids=[649], model_name=['Arturia MiniLab mkII']),
+		caps.PORTS_KEY: [
+			caps.inport(props=[caps.NOTES_CC, caps.SCRIPT, caps.REMOTE]),
+			caps.outport(props=[caps.SCRIPT])
+		]
+	}
 
 
 def create_instance(c_instance):
-    return MiniArt(c_instance=c_instance)
+	return MiniArt(c_instance=c_instance)
