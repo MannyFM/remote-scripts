@@ -1,0 +1,3 @@
+[submodule "AbletonLive-API-Stub"]
+	path = AbletonLive-API-Stub
+	url = https://github.com/cylab/AbletonLive-API-Stub
