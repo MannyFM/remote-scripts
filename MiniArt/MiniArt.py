@@ -31,8 +31,8 @@ class MiniArt(ControlSurface):
         """everything except the '_on_selected_track_changed' override and 'disconnect' runs from here"""
         ControlSurface.__init__(self, c_instance)
 
-        self.log_message(time.strftime("%d.%m.%Y %H:%M:%S", time.localtime(
-        )) + "--------------= ProjectX log opened =--------------")
+        self.log_message(time.strftime("%d.%m.%Y %H:%M:%S", time.localtime()) +
+                         "--------------= ProjectX log opened =--------------")
 
         with self.component_guard():
             self._create_transport_control()
@@ -43,27 +43,12 @@ class MiniArt(ControlSurface):
         self.log_message("Captain's last log stardate ****")
 
     def _create_transport_control(self):
-        is_momentary = True
 
         self._transport = TransportComponent(is_enabled=True, name='Transport')
         """set up the buttons"""
-        self._transport.set_play_button(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 61))
-        self._transport.set_stop_button(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 63))
-        self._transport.set_record_button(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 66))
-        self._transport.set_overdub_button(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 68))
-        self._transport.set_nudge_buttons(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 75),
-                                          ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 73))
-        self._transport.set_tap_tempo_button(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 78))
-        self._transport.set_metronome_button(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 80))
-        self._transport.set_loop_button(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 82))
-        self._transport.set_punch_buttons(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 85),
-                                          ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 87))
-        self._transport.set_seek_buttons(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 90),
-                                         ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 92))
-        """set up the sliders"""
+
         self._transport.set_tempo_control(SliderElement(MIDI_CC_TYPE, CHANNEL, 26),
                                           SliderElement(MIDI_CC_TYPE, CHANNEL, 25))
-        self._transport.set_song_position_control(SliderElement(MIDI_CC_TYPE, CHANNEL, 24))
 
         self.log_message("Captain's log stardate 1")
 
@@ -79,21 +64,12 @@ class MiniArt(ControlSurface):
         mixer.channel_strip(0)
 
         """set up the mixer buttons"""
-        mixer.set_select_buttons(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 56), ButtonElement(
-            is_momentary, MIDI_NOTE_TYPE, CHANNEL, 54))
-        mixer.master_strip().set_select_button(ButtonElement(
-            is_momentary, MIDI_NOTE_TYPE, CHANNEL, 94))
-        mixer.selected_strip().set_mute_button(ButtonElement(
-            is_momentary, MIDI_NOTE_TYPE, CHANNEL, 42))
-        mixer.selected_strip().set_solo_button(ButtonElement(
-            is_momentary, MIDI_NOTE_TYPE, CHANNEL, 44))
-        mixer.selected_strip().set_arm_button(ButtonElement(
-            is_momentary, MIDI_NOTE_TYPE, CHANNEL, 46))
+        mixer.set_select_buttons(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 56),
+                                 ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 54))
+        mixer.selected_strip().set_arm_button(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 46))
+
         """set up the mixer sliders"""
-        mixer.selected_strip().set_volume_control(SliderElement(
-            MIDI_CC_TYPE, CHANNEL, 14))
-        """note that we have split the mixer functions across two scripts, in order to have two session highlight 
-        boxes (one red, one yellow), so there are a few things which we are not doing here... """
+        mixer.selected_strip().set_volume_control(SliderElement(MIDI_CC_TYPE, CHANNEL, 14))
 
         self.log_message("Captain's log stardate 2")
 
@@ -111,16 +87,19 @@ class MiniArt(ControlSurface):
                                        ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 49))
         session.set_stop_all_clips_button(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 70))
         session.selected_scene().set_launch_button(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 30))
+
         """Here we set up the scene launch assignments for the session"""
         launch_notes = [60, 62, 64, 65, 67, 69, 71]
         for index in range(num_scenes):
             session.scene(index).set_launch_button(ButtonElement(is_momentary, MIDI_NOTE_TYPE,
                                                                  CHANNEL, launch_notes[index]))
+
         """Here we set up the track stop launch assignment(s) for the session"""
         stop_track_buttons = []
         for index in range(num_tracks):
             stop_track_buttons.append(ButtonElement(is_momentary, MIDI_NOTE_TYPE, CHANNEL, 58 + index))
         session.set_stop_track_clip_buttons(tuple(stop_track_buttons))
+
         """Here we set up the clip launch assignments for the session"""
         clip_launch_notes = [48, 50, 52, 53, 55, 57, 59]
         for index in range(num_scenes):
@@ -136,11 +115,9 @@ class MiniArt(ControlSurface):
         to this function"""
         ControlSurface._on_selected_track_changed(self)
         """here we set the mixer and session to the selected track, when the selected track changes"""
-        selected_track = self.song(
-        ).view.selected_track
+        selected_track = self.song().view.selected_track
         mixer.channel_strip(0).set_track(selected_track)
-        all_tracks = (
-            (self.song().tracks + self.song().return_tracks) + (self.song().master_track,))
+        all_tracks = ((self.song().tracks + self.song().return_tracks) + (self.song().master_track,))
         index = list(all_tracks).index(selected_track)
         session.set_offsets(index, session._scene_offset)
 

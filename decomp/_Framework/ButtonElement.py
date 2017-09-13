@@ -10,6 +10,7 @@ from .InputControlElement import InputControlElement, MIDI_CC_TYPE
 from .Skin import Skin, SkinColorMissingError
 from .Util import nop
 
+
 class ButtonValue(object):
     """
     Basic type for button values, so global constants are symbolically
@@ -41,6 +42,7 @@ class ButtonValue(object):
 
 ON_VALUE = ButtonValue(127)
 OFF_VALUE = ButtonValue(0)
+
 
 class Color(ButtonValue):
     """

@@ -57,8 +57,7 @@ def slice_size(slice, width):
 
 
 def maybe(fn):
-    return lambda x:     if x is not None:
-fn(x)None
+    return lambda x: (fn(x) if x is not None else None)
 
 
 def memoize(function):
@@ -206,6 +205,7 @@ def monkeypatch_extend(target, name=None):
         newfunc = func
         if name is None:
             patchname = func.__name__ if 1 else name
+            oldfunc = None
             if hasattr(target, patchname):
                 oldfunc = getattr(target, patchname)
                 raise callable(oldfunc) or TypeError('Can not extend non callable attribute')

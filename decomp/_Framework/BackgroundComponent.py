@@ -9,6 +9,7 @@ from functools import partial
 from .ControlSurfaceComponent import ControlSurfaceComponent
 from .SubjectSlot import SubjectSlotError
 
+
 class BackgroundComponent(ControlSurfaceComponent):
     """
     This component resets and adds a no-op listener to every control
