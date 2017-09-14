@@ -80,8 +80,11 @@ class MiniLab(ArturiaControlSurface):
                 self._return_b_encoder
             ]])
         self._pads = ButtonMatrixElement(rows=[
-            [ButtonElement(True, MIDI_NOTE_TYPE, self.pad_channel, col + 36 + 8 * row, name='Pad_%d_%d' % (col, row))
-             for col in xrange(8)] for row in xrange(2)])
+            [
+                ButtonElement(True, MIDI_NOTE_TYPE, self.pad_channel, col + 36 + 8 * row, name='Pad_%d_%d' % (col, row))
+                for col in xrange(8)
+            ] for row in xrange(2)
+        ])
 
     def _create_device(self):
         self._device = DeviceComponent(name='Device', is_enabled=False,
